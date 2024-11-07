@@ -106,17 +106,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             Theme.of(context).colorScheme.primary,
                             Icon(
                               Icons.arrow_forward,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Colors.blue,
                             ),
                           ),
                           itemDashboard(
                             'Dormitory',
                             'Dormitory',
                             CupertinoIcons.building_2_fill,
-                            Theme.of(context).colorScheme.primaryContainer,
+                            Colors.greenAccent,
                             Icon(
                               Icons.arrow_forward,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Colors.blue,
                             ),
                           ),
                           itemDashboard(
@@ -205,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'SOCIAL LINKS',
+                      'SOCIAL MEDIA',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: Theme.of(context).colorScheme.secondary,
                           ),
@@ -218,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         IconButton(
                           icon: FaIcon(
                             FontAwesomeIcons.twitter,
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Colors.blue,
                           ),
                           onPressed: () {
                             _launchURL('https://twitter.com/haramayauniver4');
@@ -227,7 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         IconButton(
                           icon: FaIcon(
                             FontAwesomeIcons.telegram,
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Colors.blue,
                           ),
                           onPressed: () {
                             _launchURL('https://t.me/hufmp');
@@ -246,13 +246,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         IconButton(
                           icon: FaIcon(
                             FontAwesomeIcons.facebook,
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Colors.blue,
                           ),
                           onPressed: () {
                             _launchURL(
                                 'https://www.facebook.com/profile.php?id=100063738112856');
                           },
                         ),
+                        SizedBox(
+                          height: 60,
+                        )
                       ],
                     ),
                   ],

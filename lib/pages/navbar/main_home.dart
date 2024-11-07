@@ -58,7 +58,6 @@ class MyApp extends StatelessWidget {
 class MainHome extends StatefulWidget {
   const MainHome({super.key, required this.toggleTheme});
   final VoidCallback toggleTheme;
-   
 
   @override
   State<MainHome> createState() => _MainHomeState();

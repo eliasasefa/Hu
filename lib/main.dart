@@ -1,59 +1,29 @@
-// import 'package:flutter/material.dart';
-// import 'pages/navbar/main_home.dart'; // Import MainHome class
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatefulWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
-
-// class _MyAppState extends State<MyApp> {
-//   // Initialize the theme mode to system by default
-//   ThemeMode themeMode = ThemeMode.light;
-
-//   // Toggle between light and dark theme
-//   void toggleTheme() {
-//     setState(() {
-//       themeMode =
-//           (themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: MainHome(toggleTheme: toggleTheme),
-//       theme: ThemeData.light(), // Light theme
-//       darkTheme: ThemeData.dark(), // Dark theme
-//       themeMode: themeMode,
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'pages/navbar/main_home.dart'; // Import MainHome class
+import 'pages/navbar/main_home.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? savedTheme = prefs.getString('themeMode');
+  ThemeMode themeMode = savedTheme == 'dark'
+      ? ThemeMode.dark
+      : savedTheme == 'light'
+          ? ThemeMode.light
+          : ThemeMode.system;
+
+  runApp(MyApp(initialThemeMode: themeMode));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
+  final ThemeMode initialThemeMode;
+  const MyApp({super.key, required this.initialThemeMode});
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  late ThemeMode themeMode;
-
+  late ThemeMode themeMode = widget.initialThemeMode;
   @override
   void initState() {
     super.initState();
@@ -75,22 +45,25 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  // Save the theme mode to SharedPreferences
   _saveTheme(ThemeMode theme) async {
     final prefs = await SharedPreferences.getInstance();
     if (theme == ThemeMode.dark) {
       prefs.setString('themeMode', 'dark');
     } else if (theme == ThemeMode.light) {
       prefs.setString('themeMode', 'light');
+    } else {
+      prefs.setString('themeMode', 'system');
     }
   }
 
-  // Toggle between light and dark theme
   void toggleTheme() {
     setState(() {
-      themeMode =
-          (themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
-      _saveTheme(themeMode); // Save the theme selection
+      themeMode = themeMode == ThemeMode.light
+          ? ThemeMode.dark
+          : themeMode == ThemeMode.dark
+              ? ThemeMode.system
+              : ThemeMode.light;
+      _saveTheme(themeMode);
     });
   }
 

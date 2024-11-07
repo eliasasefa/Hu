@@ -50,7 +50,7 @@ dependencies:
   get: ^4.6.6
   shared_preferences: ^2.2.3
   adaptive_theme: ^3.6.0
-  
+  easy_dynamic_theme: ^2.2.0
 
 dev_dependencies:
   flutter_test:
