@@ -20,7 +20,9 @@ class _SplashState extends State<Splash> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const MainHome(),
+          builder: (context) => MainHome(
+            toggleTheme: () {},
+          ),
         ));
   }
 

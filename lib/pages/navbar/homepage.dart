@@ -3,12 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
 import 'package:mywebapp/pages/custom_widgets/custom_webview.dart';
 import 'package:mywebapp/pages/custom_widgets/custom_widget.dart';
 import 'package:mywebapp/pages/drawer_pages/home_screen_image_scroller.dart';
-import 'package:mywebapp/theme/theme_provider.dart';
-import 'package:mywebapp/theme/themes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -327,9 +324,7 @@ class _MyHomePageState extends State<MyHomePage> {
         margin: const EdgeInsets.all(5),
         padding: EdgeInsets.zero,
         decoration: BoxDecoration(
-          color: Get.find<ThemeController>().isLightMode
-              ? Theme.of(context).cardColor
-              : Theme.of(context).colorScheme.background,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -352,7 +347,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: background,
                 shape: BoxShape.circle,
               ),
-              child: Icon(iconData, color: AppTheme.primaryTextColor, size: 20),
+              child: Icon(iconData, color: Colors.white, size: 20),
             ),
             const SizedBox(height: 5),
             Text(

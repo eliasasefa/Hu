@@ -56,7 +56,9 @@ class MyApp extends StatelessWidget {
 }
 
 class MainHome extends StatefulWidget {
-  const MainHome({super.key});
+  const MainHome({super.key, required this.toggleTheme});
+  final VoidCallback toggleTheme;
+   
 
   @override
   State<MainHome> createState() => _MainHomeState();
@@ -93,7 +95,10 @@ class _MainHomeState extends State<MainHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavBar(onMenuItemClicked: (dynamic) {}),
+      drawer: NavBar(
+        onMenuItemClicked: (dynamic) {},
+        toggleTheme: widget.toggleTheme,
+      ),
       appBar: AppBar(
         actions: [
           IconButton(
