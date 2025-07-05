@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: CampusesPage(),
-  ));
-}
-
 class Campus {
   final String name;
   final String imageUrl;
@@ -56,40 +50,138 @@ class CampusesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Haramaya University Campuses'),
-        backgroundColor: Colors.blueGrey,
-      ),
-      body: ListView.builder(
-        itemCount: campuses.length,
-        itemBuilder: (context, index) {
-          final campus = campuses[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(10),
-              leading: Image.asset(
-                campus.imageUrl,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-              ),
-              title: Text(campus.name,
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(campus.address),
-              trailing: const Icon(Icons.arrow_forward),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CampusDetailPage(campus: campus),
-                  ),
-                );
-              },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              backgroundImage: const AssetImage('assets/images/hu1-logo.png'),
+              radius: 16,
+              backgroundColor: theme.colorScheme.surface,
             ),
-          );
-        },
+            const SizedBox(width: 10),
+            Text(
+              'Campuses',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+                letterSpacing: 1.1,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [theme.colorScheme.surface, theme.colorScheme.background]
+                : [
+                    theme.colorScheme.primary.withOpacity(0.07),
+                    theme.colorScheme.background
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+            itemCount: campuses.length,
+            itemBuilder: (context, index) {
+              final campus = campuses[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CampusDetailPage(campus: campus),
+                    ),
+                  );
+                },
+                child: Card(
+                  elevation: 6,
+                  margin: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Hero(
+                          tag: campus.imageUrl,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              campus.imageUrl,
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 18),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary
+                                          .withOpacity(0.7),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      campus.name,
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                campus.address,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.hintColor,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Icon(Icons.arrow_forward_ios,
+                            color: theme.colorScheme.primary, size: 22),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -102,42 +194,104 @@ class CampusDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(campus.name),
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          campus.name,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset(
-                campus.imageUrl,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [theme.colorScheme.surface, theme.colorScheme.background]
+                : [
+                    theme.colorScheme.primary.withOpacity(0.07),
+                    theme.colorScheme.background
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: campus.imageUrl,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(22),
+                      child: Image.asset(
+                        campus.imageUrl,
+                        width: double.infinity,
+                        height: 220,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(22.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            campus.name,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.location_on,
+                                  color: theme.colorScheme.primary, size: 20),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  campus.address,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.hintColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
+                            campus.description,
+                            style: theme.textTheme.bodyLarge
+                                ?.copyWith(height: 1.5),
+                            textAlign: TextAlign.justify,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                campus.name,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                campus.address,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                campus.description,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
+            ),
           ),
         ),
       ),

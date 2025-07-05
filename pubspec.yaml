@@ -31,31 +31,36 @@ dependencies:
   flutter:
     sdk: flutter
   url_launcher: ^6.2.3
-  connectivity: ^3.0.6
-  flutter_inappwebview: ^5.0.0
+  flutter_inappwebview: ^6.1.5
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
-  flutter_carousel_widget: ^2.2.0
+  flutter_carousel_widget: ^3.1.0
   another_carousel_pro: ^1.0.2
   google_fonts: ^6.2.1
   google_maps_flutter: ^2.6.0
-  geolocator: ^11.0.0
+  geolocator: ^10.1.0
   community_material_icon: ^5.9.55
   font_awesome_flutter: ^10.7.0
-  permission_handler: ^11.3.1
+  permission_handler: ^12.0.0+1
   flutter_html: ^3.0.0-beta.2
   webview_flutter: ^4.7.0
   get: ^4.6.6
   shared_preferences: ^2.2.3
   adaptive_theme: ^3.6.0
   easy_dynamic_theme: ^2.2.0
+  firebase_core: ^2.25.4
+  cloud_firestore: ^4.9.3
+  file_picker: ^6.1.1
+  firebase_auth: ^4.7.0
+  local_auth: ^2.1.8
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.13.1"
+  flutter_launcher_icons: ^0.14.4
 
 flutter_launcher_icons:
   android: "launcher_icon"

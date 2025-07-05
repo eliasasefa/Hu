@@ -12,7 +12,7 @@ class WebViewPage extends StatefulWidget {
 }
 
 class _WebViewPageState extends State<WebViewPage> {
-  late final InAppWebViewController controller;
+  InAppWebViewController? controller;
 
   bool _isLoading = true;
   bool _hasError = false;
@@ -26,46 +26,80 @@ class _WebViewPageState extends State<WebViewPage> {
           initialOptions: InAppWebViewGroupOptions(
             crossPlatform: InAppWebViewOptions(
               useShouldOverrideUrlLoading: true,
+              javaScriptEnabled: true,
+              cacheEnabled: true,
             ),
           ),
-          initialUrlRequest: URLRequest(
-            iosAllowsCellularAccess: true,
-            url: Uri.parse(widget.url),
-          ),
-          onWebViewCreated: (controller) {
+          initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+          onWebViewCreated: (InAppWebViewController controller) {
             this.controller = controller;
           },
           onLoadStart: (InAppWebViewController controller, Uri? url) {
-            setState(() {
-              _isLoading = true;
-            });
+            if (mounted) {
+              setState(() {
+                _isLoading = true;
+                _hasError = false;
+              });
+            }
           },
-          onLoadStop: (InAppWebViewController controller, Uri? url) {
-            remover.evaluateJavaScriptToHideElements(controller);
-            setState(() {
-              _isLoading = false;
-            });
+          onLoadStop: (InAppWebViewController controller, Uri? url) async {
+            try {
+              await remover.evaluateJavaScriptToHideElements(controller);
+            } catch (e) {
+              print('Error hiding elements: $e');
+            }
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+              });
+            }
           },
-          onLoadError: (controller, url, code, message) {
+          onLoadError: (InAppWebViewController controller, Uri? url, int code,
+              String message) {
             print("Error loading page: $code, $message");
-            setState(() {
-              _hasError = true;
-            });
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+                _hasError = true;
+              });
+            }
           },
         ),
         if (_isLoading)
-          Center(
+          const Center(
             child: CircularProgressIndicator(),
           ),
         if (_hasError)
           Center(
-            child: Text(
-              'Error loading page. \nPlease check your internet connection.',
-              style: TextStyle(color: Colors.red),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 64,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Error loading page.\nPlease check your internet connection.',
+                  style: TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isLoading = true;
+                      _hasError = false;
+                    });
+                    controller?.reload();
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
             ),
           ),
       ],
     );
   }
 }
-
