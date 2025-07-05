@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mywebapp/pages/drawer_pages/about_us.dart';
 import 'package:mywebapp/pages/drawer_pages/campuses.dart';
 import 'package:mywebapp/pages/drawer_pages/developer_profile.dart';
+import 'package:mywebapp/pages/drawer_pages/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class NavBar extends StatelessWidget {
@@ -126,6 +127,18 @@ class NavBar extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => DeveloperProfile()),
+                );
+              },
+            ),
+            _buildNavItem(
+              context,
+              icon: Icons.settings,
+              label: 'Settings',
+              accent: Colors.blueGrey,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
               },
             ),
