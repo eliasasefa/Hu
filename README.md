@@ -8,10 +8,10 @@
 A comprehensive Flutter application designed for Haramaya University students and staff, providing seamless access to university services, exit exam management, and secure authentication.
 
 ## 📱 Screenshots
+<img width="360" height="806" alt="Screenshot_20250710-131045" src="https://github.com/user-attachments/assets/1a424e33-aac6-4bab-90e2-18b9afb32035" />
 <img width="360" height="806" alt="Screenshot_20250710-131018" src="https://github.com/user-attachments/assets/48a857af-7bf1-421a-8c4a-f894e272b441" />
 <img width="360" height="806" alt="Screenshot_20250710-130754" src="https://github.com/user-attachments/assets/bbd29d9e-daee-46f3-86cc-3fb7104f034b" />
 
-<img width="360" height="806" alt="Screenshot_20250710-131045" src="https://github.com/user-attachments/assets/1a424e33-aac6-4bab-90e2-18b9afb32035" />
 
 
 
