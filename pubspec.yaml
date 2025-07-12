@@ -56,6 +56,7 @@ dependencies:
   firebase_auth: ^4.7.0
   local_auth: ^2.1.8
   flutter_secure_storage: ^9.0.0
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +97,7 @@ flutter:
     - assets/images/HIt-Dorm.jpg
     - assets/images/cvm-gate.jpg
     - assets/images/HrU-Main-Gate.png
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

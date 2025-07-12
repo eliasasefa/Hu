@@ -7,9 +7,17 @@ import 'pages/exit_exam/take_exit_exam_page.dart';
 import 'pages/exit_exam/import_exit_exam_questions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/auth/login_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Load environment variables from .env file
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    // You may want to log or handle this error
+    debugPrint('Failed to load .env file: $e');
+  }
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
   // Initialize Firebase
