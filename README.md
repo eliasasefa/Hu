@@ -10,6 +10,18 @@ A comprehensive Flutter application designed for Haramaya University students an
 ## 📱 Screenshots
 <img width="360" height="806" alt="Screenshot_20250710-131045" src="https://github.com/user-attachments/assets/1a424e33-aac6-4bab-90e2-18b9afb32035" />
 <img width="360" height="806" alt="Screenshot_20250710-131018" src="https://github.com/user-attachments/assets/48a857af-7bf1-421a-8c4a-f894e272b441" />
+<img width="720" height="1612" alt="Screenshot_20250710-130736" src="https://github.com/user-attachments/assets/8e17f541-598e-4324-a359-52cf5129d9b7" />
+<img width="360" height="806" alt="Screenshot_20250710-130726" src="https://github.com/user-attachments/assets/f359d7cb-370f-4775-bc8e-748ca48f3ae0" />
+<img width="360" height="806" alt="Screenshot_20250710-130657" src="https://github.com/user-attachments/assets/fcddbad4-07ce-48dc-a6ee-6b5b876878fa" />
+<img width="360" height="806" alt="Screenshot_20250710-130920" src="https://github.com/user-attachments/assets/32326708-f2fc-4770-b513-a42af6263b45" />
+<img width="360" height="806" alt="Screenshot_20250710-130930" src="https://github.com/user-attachments/assets/3f29a3d8-ea56-4e24-9709-d1de95044100" />
+<img width="360" height="806" alt="Screenshot_20250710-130935" src="https://github.com/user-attachments/assets/76becb5e-7c35-4722-913a-2d64e16df08a" />
+<img width="360" height="806" alt="Screenshot_20250710-130951" src="https://github.com/user-attachments/assets/b37fb3f3-d09f-4b54-bf60-1e9410fe82cf" />
+<img width="360" height="806" alt="Screenshot_20250710-131000" src="https://github.com/user-attachments/assets/3e16d3d9-a74d-46cd-9555-2be3c2eebfd0" />
+<img width="360" height="806" alt="Screenshot_20250710-131039" src="https://github.com/user-attachments/assets/2fe9c39e-107c-43b2-b333-d6c791bd0c45" />
+<img width="360" height="806" alt="Screenshot_20250710-130847" src="https://github.com/user-attachments/assets/9c1142c5-4286-4b10-b615-1ef3bd13a8df" />
+<img width="360" height="806" alt="Screenshot_20250710-133101" src="https://github.com/user-attachments/assets/118a516b-16e9-4003-ad5d-cda16964b1de" />
+<img width="360" height="806" alt="Screenshot_20250710-130910" src="https://github.com/user-attachments/assets/2a84a8cf-64e9-42a3-b315-55ab9d1ab592" />
 <img width="360" height="806" alt="Screenshot_20250710-130754" src="https://github.com/user-attachments/assets/bbd29d9e-daee-46f3-86cc-3fb7104f034b" />
 
 
