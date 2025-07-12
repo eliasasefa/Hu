@@ -135,7 +135,7 @@ class DeveloperProfile extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                "Recent Software Engineering graduate with a strong foundation in developing innovative mobile and web applications. Proficient in Flutter, Dart, Firebase, and contemporary web technologies. Committed to leveraging technical expertise to address real-world challenges and continuously advancing skills through learning and collaboration.",
+                                "Recent Software Engineering graduate with a strong foundation in developing innovative mobile and web applications. Proficient in Flutter, Dart, Firebase, and contemporary web technologies.",
                                 textAlign: TextAlign.left,
                                 style: theme.textTheme.bodyLarge
                                     ?.copyWith(height: 1.5),
@@ -157,8 +157,8 @@ class DeveloperProfile extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
+                                spacing: 5,
+                                runSpacing: 0,
                                 alignment: WrapAlignment.center,
                                 children: [
                                   _buildSkillChip('Flutter', theme,

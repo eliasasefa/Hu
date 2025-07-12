@@ -17,6 +17,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Only sign out on app start if remember_me is not enabled
+  final rememberMe = prefs.getBool('remember_me') ?? false;
+  if (!rememberMe) {
+    await FirebaseAuth.instance.signOut();
+  }
+
   String? savedTheme = prefs.getString('themeMode');
   ThemeMode themeMode = savedTheme == 'dark'
       ? ThemeMode.dark

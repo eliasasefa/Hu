@@ -2,24 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>744120112807-tsr63qelqr5egqnav8s5s6ifi5vjv9c9.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.744120112807-tsr63qelqr5egqnav8s5s6ifi5vjv9c9</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>744120112807-7d7msgokgvb7rkcb86jv9oqppsrip3ph.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAwWPjdn0ffh_f5t_sW7Kqo_ZiD63ZbHY0</string>
+	<string>AIzaSyDKpiRAR_Izbgae4YnPqT-3CSzDRyu4pw8</string>
 	<key>GCM_SENDER_ID</key>
-	<string>744120112807</string>
+	<string>164188610636</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.hu.com</string>
+	<string>com.hu.app</string>
 	<key>PROJECT_ID</key>
-	<string>hotelbooking-b79a6</string>
+	<string>hu-app-b200b</string>
 	<key>STORAGE_BUCKET</key>
-	<string>hotelbooking-b79a6.appspot.com</string>
+	<string>hu-app-b200b.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:744120112807:ios:d3b6c7aec284d86b15ed82</string>
+	<string>1:164188610636:ios:27667d45555f4e1eac14e9</string>
 </dict>
 </plist>

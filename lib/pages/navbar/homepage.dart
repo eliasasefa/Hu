@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mywebapp/pages/custom_widgets/custom_webview.dart';
-import 'package:mywebapp/pages/custom_widgets/custom_widget.dart';
 import 'package:mywebapp/pages/drawer_pages/home_screen_image_scroller.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mywebapp/pages/exit_exam/exam_center.dart';
@@ -107,16 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           'ExitExam',
                           CupertinoIcons.text_badge_star,
                           Colors.purple,
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        itemDashboard(
-                          'Exam Center',
-                          'ExamCenter',
-                          Icons.quiz,
-                          Colors.deepPurple,
                           Icon(
                             Icons.arrow_forward,
                             color: Colors.blue,
@@ -313,66 +302,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     url: 'http://dormitoryps.haramaya.edu.et/DormSearch.aspx',
                   );
                 case 'ExitExam':
-                  return Scaffold(
-                    appBar: AppBar(
-                      title: const Text('Exit Exam'),
-                      actions: [
-                        IconButton(
-                          icon: const Icon(Icons.info_outline),
-                          tooltip: 'How to prepare your JSON file',
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('JSON Format Help'),
-                                content: const Text(
-                                    'Your JSON file should be an array of questions.\n\nExample:\n[\n  {\n    "question": "What is SQL?",\n    "answers": ["Structured Query Language", "Simple Query Language", "Sequential Query Language", "Standard Question Language"],\n    "correctAnswer": 0\n  }\n]\nEach question must have exactly 4 answers and the correctAnswer is the index (0-3) of the correct one.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    body: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.upload_file),
-                            label: const Text('Import Exam Questions (JSON)'),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(220, 48),
-                              textStyle: const TextStyle(fontSize: 18),
-                            ),
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pushNamed('/import-exit-exam-questions');
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.assignment_turned_in),
-                            label: const Text('Take Exit Exam'),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(220, 48),
-                              textStyle: const TextStyle(fontSize: 18),
-                            ),
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pushNamed('/take-exit-exam');
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                case 'ExamCenter':
                   return const ExamCenterPage();
                 case 'Elearning':
                   return const CustomWebView(

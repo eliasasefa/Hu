@@ -17,6 +17,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _biometricEnabled = false;
   bool _loading = true;
   String? _userEmail;
+  String _biometricStatus = 'Checking...';
+  List<BiometricType> _availableBiometrics = [];
 
   @override
   void initState() {
@@ -26,23 +28,54 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadSettings() async {
     try {
-      // Check if biometric is available
-      final isAvailable = await _localAuth.canCheckBiometrics;
+      // Comprehensive biometric availability check
       final isDeviceSupported = await _localAuth.isDeviceSupported();
+      final canCheckBiometrics = await _localAuth.canCheckBiometrics;
+      final availableBiometrics = await _localAuth.getAvailableBiometrics();
 
       // Load current settings
       final biometricEnabled =
           await _secureStorage.read(key: 'biometric_enabled');
       final userEmail = await _secureStorage.read(key: 'last_logged_in_email');
+      final storedPassword = await _secureStorage.read(key: 'stored_password');
+
+      // Determine biometric availability
+      bool isAvailable = false;
+      String status = 'Not available';
+
+      if (isDeviceSupported && canCheckBiometrics) {
+        if (availableBiometrics.isNotEmpty) {
+          isAvailable = true;
+          status = 'Available';
+        } else {
+          status = 'No biometrics enrolled';
+        }
+      } else if (!isDeviceSupported) {
+        status = 'Device not supported';
+      } else if (!canCheckBiometrics) {
+        status = 'Biometric check not available';
+      }
+
+      // Only enable biometric if credentials are present
+      bool biometricEnabledFinal = biometricEnabled == 'true' &&
+          userEmail != null &&
+          storedPassword != null;
+      if (biometricEnabled == 'true' && !biometricEnabledFinal) {
+        // If biometric was enabled but credentials are missing, turn it off
+        await _secureStorage.write(key: 'biometric_enabled', value: 'false');
+      }
 
       setState(() {
-        _biometricAvailable = isAvailable && isDeviceSupported;
-        _biometricEnabled = biometricEnabled == 'true';
+        _biometricAvailable = isAvailable;
+        _biometricEnabled = biometricEnabledFinal;
         _userEmail = userEmail;
+        _biometricStatus = status;
+        _availableBiometrics = availableBiometrics;
         _loading = false;
       });
     } catch (e) {
       setState(() {
+        _biometricStatus = 'Error: $e';
         _loading = false;
       });
     }
@@ -60,29 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _enableBiometric() async {
     try {
-      // First, verify the user's current password
-      final password = await _showPasswordDialog();
-      if (password == null) return;
-
-      // Verify password with Firebase
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        try {
-          // Reauthenticate to verify password
-          final credential = EmailAuthProvider.credential(
-            email: user.email!,
-            password: password,
-          );
-          await user.reauthenticateWithCredential(credential);
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Incorrect password')),
-          );
-          return;
-        }
-      }
-
-      // Authenticate with biometrics
+      // Authenticate with biometrics only
       final isAuthenticated = await _localAuth.authenticate(
         localizedReason: 'Please authenticate to enable biometric login',
         options: const AuthenticationOptions(
@@ -92,8 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
       );
 
       if (isAuthenticated) {
-        // Store credentials securely
-        await _secureStorage.write(key: 'stored_password', value: password);
+        // Store credentials securely (if needed, e.g., for biometric login)
         await _secureStorage.write(key: 'biometric_enabled', value: 'true');
         setState(() {
           _biometricEnabled = true;
@@ -128,36 +138,21 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<String?> _showPasswordDialog() async {
-    final TextEditingController passwordController = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Enter Password'),
-          content: TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              hintText: 'Enter your current password',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(passwordController.text),
-              child: const Text('Confirm'),
-            ),
-          ],
-        );
-      },
-    );
+  String _getBiometricTypeName(BiometricType type) {
+    switch (type) {
+      case BiometricType.face:
+        return 'Face ID';
+      case BiometricType.fingerprint:
+        return 'Fingerprint';
+      case BiometricType.iris:
+        return 'Iris';
+      case BiometricType.strong:
+        return 'Strong Biometric';
+      case BiometricType.weak:
+        return 'Weak Biometric';
+      default:
+        return 'Unknown';
+    }
   }
 
   @override
@@ -173,117 +168,87 @@ class _SettingsPageState extends State<SettingsPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(18),
               children: [
                 // Account Section
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0, left: 4),
+                  child: Text('Account',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold)),
+                ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18)),
+                  elevation: 2,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Account',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ListTile(
-                          leading: const Icon(Icons.email),
-                          title: const Text('Email'),
-                          subtitle: Text(user?.email ?? 'Not available'),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.person),
-                          title: const Text('User ID'),
-                          subtitle: Text(user?.uid ?? 'Not available'),
-                        ),
-                      ],
+                    padding: const EdgeInsets.all(18),
+                    child: ListTile(
+                      leading: const Icon(Icons.email),
+                      title: const Text('Email'),
+                      subtitle: Text(user?.email ?? 'Not available'),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-
+                const SizedBox(height: 18),
                 // Security Section
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 4),
+                  child: Text('Security',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold)),
+                ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18)),
+                  elevation: 2,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Security',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        if (_biometricAvailable) ...[
-                          SwitchListTile(
-                            title: const Text('Biometric Login'),
-                            subtitle: const Text(
-                                'Use fingerprint or face recognition to sign in'),
-                            secondary: const Icon(Icons.fingerprint),
-                            value: _biometricEnabled,
-                            onChanged: _toggleBiometric,
-                          ),
-                          if (_biometricEnabled && _userEmail != null)
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 8),
-                              child: Text(
-                                'Linked to: $_userEmail',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                        ] else ...[
-                          ListTile(
-                            leading: const Icon(Icons.fingerprint,
-                                color: Colors.grey),
-                            title: const Text('Biometric Login'),
-                            subtitle:
-                                const Text('Not available on this device'),
-                            enabled: false,
-                          ),
-                        ],
-                      ],
+                    padding: const EdgeInsets.all(18),
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.fingerprint,
+                        color: _biometricAvailable
+                            ? theme.colorScheme.primary
+                            : Colors.grey,
+                      ),
+                      title: const Text('Biometric Login'),
+                      subtitle: Text(_biometricAvailable
+                          ? 'Enable quick login with biometrics.'
+                          : _biometricStatus == 'No biometrics enrolled'
+                              ? 'No biometrics enrolled on this device.'
+                              : 'Biometric not available.'),
+                      trailing: _biometricAvailable
+                          ? Switch(
+                              value: _biometricEnabled,
+                              onChanged:
+                                  (FirebaseAuth.instance.currentUser != null)
+                                      ? _toggleBiometric
+                                      : null,
+                            )
+                          : null,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-
-                // Actions Section
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Actions',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ListTile(
-                          leading: const Icon(Icons.logout, color: Colors.red),
-                          title: const Text('Sign Out'),
-                          subtitle: const Text('Sign out of your account'),
-                          onTap: () async {
-                            await FirebaseAuth.instance.signOut();
-                            if (mounted) {
-                              Navigator.of(context).pop();
-                            }
-                          },
-                        ),
-                      ],
+                const SizedBox(height: 32),
+                if (user?.email == 'eliasasefa3@gmail.com')
+                  Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18)),
+                    elevation: 2,
+                    child: ListTile(
+                      leading: const Icon(Icons.upload_file),
+                      title: const Text('Import Exam Questions'),
+                      subtitle: const Text(
+                          'Import exit exam questions from a JSON file'),
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed('/import-exit-exam-questions');
+                      },
                     ),
                   ),
-                ),
               ],
             ),
     );

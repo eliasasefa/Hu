@@ -16,11 +16,15 @@ class _ImportExitExamQuestionsPageState
     extends State<ImportExitExamQuestionsPage> {
   bool _isImporting = false;
   String? _status;
+  int _currentImport = 0;
+  int _totalToImport = 0;
 
   Future<void> _importQuestionsFromFile() async {
     setState(() {
       _isImporting = true;
       _status = null;
+      _currentImport = 0;
+      _totalToImport = 0;
     });
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -53,17 +57,26 @@ class _ImportExitExamQuestionsPageState
         return;
       }
       int imported = 0;
-      for (final q in questions) {
+      setState(() {
+        _totalToImport = questions.length;
+      });
+      final docRef = FirebaseFirestore.instance
+          .collection('exit_exam_questions')
+          .doc('${department}_${year}_${examType}');
+      for (int i = 0; i < questions.length; i++) {
+        final q = questions[i];
+        setState(() {
+          _currentImport = i + 1;
+        });
         if (q['question'] != null &&
             q['answers'] != null &&
             q['correctAnswer'] != null &&
             (q['answers'] as List).length == 4) {
-          await FirebaseFirestore.instance
-              .collection('exit_exam_questions')
-              .add({
+          await docRef.collection('questions').add({
             'question': q['question'],
             'answers': List<String>.from(q['answers']),
             'correctAnswer': q['correctAnswer'],
+            'explanation': q['explanation'] ?? '',
             'department': department,
             'year': year,
             'examType': examType,
@@ -75,6 +88,13 @@ class _ImportExitExamQuestionsPageState
       setState(() {
         _status = 'Imported $imported questions successfully!';
       });
+      if (imported > 0 && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Imported $imported questions successfully!')),
+        );
+        await Future.delayed(const Duration(milliseconds: 1500));
+        if (mounted) Navigator.of(context).pop();
+      }
     } catch (e) {
       setState(() {
         _status = 'Error: $e';
@@ -82,6 +102,8 @@ class _ImportExitExamQuestionsPageState
     } finally {
       setState(() {
         _isImporting = false;
+        _currentImport = 0;
+        _totalToImport = 0;
       });
     }
   }
@@ -102,7 +124,22 @@ class _ImportExitExamQuestionsPageState
                 onPressed: _isImporting ? null : _importQuestionsFromFile,
               ),
               const SizedBox(height: 24),
-              if (_isImporting) const CircularProgressIndicator(),
+              if (_isImporting) ...[
+                if (_totalToImport > 0)
+                  Column(
+                    children: [
+                      Text(
+                          'Importing question $_currentImport of $_totalToImport...'),
+                      const SizedBox(height: 12),
+                      LinearProgressIndicator(
+                        value: _currentImport / _totalToImport,
+                        minHeight: 8,
+                      ),
+                    ],
+                  )
+                else
+                  const CircularProgressIndicator(),
+              ],
               if (_status != null) ...[
                 const SizedBox(height: 16),
                 Text(_status!,

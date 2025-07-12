@@ -4,8 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mywebapp/pages/custom_widgets/custom_webview_navbar.dart';
 import 'package:mywebapp/pages/navbar/homepage.dart';
 import 'package:mywebapp/pages/navigator.dart';
-import 'package:mywebapp/pages/splash/splash.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({super.key, required this.toggleTheme});
@@ -32,6 +31,8 @@ class _MainHomeState extends State<MainHome> {
   int current = 0;
   PageController pageController = PageController();
   ScrollController _scrollController = ScrollController();
+  bool _showRememberMeBanner = false;
+  bool _rememberMeBannerChecked = false;
 
   @override
   void initState() {
@@ -41,6 +42,32 @@ class _MainHomeState extends State<MainHome> {
         current = pageController.page!.round();
       });
     });
+    _checkRememberMe();
+  }
+
+  Future<void> _checkRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rememberMe = prefs.getBool('remember_me') ?? false;
+    final bannerShown = prefs.getBool('remember_me_banner_shown') ?? false;
+    setState(() {
+      _showRememberMeBanner = !rememberMe && !bannerShown;
+      _rememberMeBannerChecked = true;
+    });
+    if (!bannerShown && !rememberMe) {
+      await prefs.setBool('remember_me_banner_shown', true);
+    }
+  }
+
+  Future<void> _enableRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('remember_me', true);
+    setState(() {
+      _showRememberMeBanner = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content: Text('Remember Me enabled! You will stay signed in.')),
+    );
   }
 
   @override
@@ -75,7 +102,7 @@ class _MainHomeState extends State<MainHome> {
           'Haramaya University',
           style: GoogleFonts.ubuntu(
             fontWeight: FontWeight.bold,
-            fontSize: 22,
+            fontSize: 18,
             color: theme.colorScheme.primary,
           ),
         ),
@@ -86,6 +113,48 @@ class _MainHomeState extends State<MainHome> {
         color: theme.colorScheme.background,
         child: Column(
           children: [
+            if (_showRememberMeBanner && _rememberMeBannerChecked)
+              Container(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Want to stay signed in? Enable "Remember Me" to skip login next time.',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Dismiss',
+                      onPressed: () {
+                        setState(() {
+                          _showRememberMeBanner = false;
+                        });
+                      },
+                    ),
+                    ElevatedButton(
+                      onPressed: _enableRememberMe,
+                      child: const Text('Enable'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),

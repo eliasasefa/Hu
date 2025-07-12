@@ -44,37 +44,37 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC1nd5Li1onmSYGE9TqBYn4Okc-r1NdQbM',
-    appId: '1:744120112807:web:606a8846dcde5bff15ed82',
-    messagingSenderId: '744120112807',
-    projectId: 'hotelbooking-b79a6',
-    authDomain: 'hotelbooking-b79a6.firebaseapp.com',
-    storageBucket: 'hotelbooking-b79a6.appspot.com',
+    apiKey: 'AIzaSyDKpiRAR_Izbgae4YnPqT-3CSzDRyu4pw8',
+    appId: '1:164188610636:web:c3218e045d5965a4ac14e9',
+    messagingSenderId: '164188610636',
+    projectId: 'hu-app-b200b',
+    authDomain: 'hu-app-b200b.firebaseapp.com',
+    storageBucket: 'hu-app-b200b.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC1nd5Li1onmSYGE9TqBYn4Okc-r1NdQbM',
-    appId: '1:744120112807:android:606a8846dcde5bff15ed82',
-    messagingSenderId: '744120112807',
-    projectId: 'hotelbooking-b79a6',
-    storageBucket: 'hotelbooking-b79a6.appspot.com',
+    apiKey: 'AIzaSyAOWt8-rQdcHLkjfinXfyF-VxgrsFUJ3Tw',
+    appId: '1:164188610636:android:c3218e045d5965a4ac14e9',
+    messagingSenderId: '164188610636',
+    projectId: 'hu-app-b200b',
+    storageBucket: 'hu-app-b200b.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC1nd5Li1onmSYGE9TqBYn4Okc-r1NdQbM',
-    appId: '1:744120112807:ios:606a8846dcde5bff15ed82',
-    messagingSenderId: '744120112807',
-    projectId: 'hotelbooking-b79a6',
-    storageBucket: 'hotelbooking-b79a6.appspot.com',
-    iosBundleId: 'com.example.hotel',
+    apiKey: 'AIzaSyDKpiRAR_Izbgae4YnPqT-3CSzDRyu4pw8',
+    appId: '1:164188610636:ios:27667d45555f4e1eac14e9',
+    messagingSenderId: '164188610636',
+    projectId: 'hu-app-b200b',
+    storageBucket: 'hu-app-b200b.firebasestorage.app',
+    iosBundleId: 'com.hu.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyC1nd5Li1onmSYGE9TqBYn4Okc-r1NdQbM',
-    appId: '1:744120112807:ios:606a8846dcde5bff15ed82',
-    messagingSenderId: '744120112807',
-    projectId: 'hotelbooking-b79a6',
-    storageBucket: 'hotelbooking-b79a6.appspot.com',
-    iosBundleId: 'com.example.hotel',
+    apiKey: 'AIzaSyDKpiRAR_Izbgae4YnPqT-3CSzDRyu4pw8',
+    appId: '1:164188610636:ios:27667d45555f4e1eac14e9',
+    messagingSenderId: '164188610636',
+    projectId: 'hu-app-b200b',
+    storageBucket: 'hu-app-b200b.firebasestorage.app',
+    iosBundleId: 'com.hu.app',
   );
 }

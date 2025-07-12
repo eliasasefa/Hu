@@ -32,6 +32,7 @@ class AboutPage extends StatelessWidget {
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
+                fontSize: 18,
                 letterSpacing: 1.1,
               ),
             ),
