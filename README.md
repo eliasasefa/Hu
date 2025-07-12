@@ -9,7 +9,9 @@ A comprehensive Flutter application designed for Haramaya University students an
 
 ## 📱 Screenshots
 
-*[Add screenshots here - you can include images of the main dashboard, exam center, authentication screens, etc.]*
+<img width="720" height="1612" alt="Screenshot_20250710-131018" src="https://github.com/user-attachments/assets/48a857af-7bf1-421a-8c4a-f894e272b441" />
+
+
 
 ## ✨ Features
 
