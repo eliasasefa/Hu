@@ -197,9 +197,9 @@ This project is proprietary software developed for Haramaya University. All righ
 
 ## 👥 Team
 
-- **Developer**: [Your Name]
+- **Developer**: Elias Asefa
 - **Institution**: Haramaya University
-- **Contact**: [Your Email]
+- **Contact**: eliasasefa3@gmail.com
 
 ## 🙏 Acknowledgments
 
