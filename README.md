@@ -1,4 +1,4 @@
-# 🎓 Haramaya University Mobile App
+# 🎓 Hu+
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.3.1+-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.0+-blue.svg)](https://dart.dev/)
@@ -9,7 +9,6 @@ A comprehensive Flutter application designed for Haramaya University students an
 
 ## 📱 Screenshots
 <img width="360" height="806" alt="Screenshot_20250710-131045" src="https://github.com/user-attachments/assets/1a424e33-aac6-4bab-90e2-18b9afb32035" />
-<img width="360" height="806" alt="Screenshot_20250710-131018" src="https://github.com/user-attachments/assets/48a857af-7bf1-421a-8c4a-f894e272b441" />
 <img width="720" height="1612" alt="Screenshot_20250710-130736" src="https://github.com/user-attachments/assets/8e17f541-598e-4324-a359-52cf5129d9b7" />
 <img width="360" height="806" alt="Screenshot_20250710-130726" src="https://github.com/user-attachments/assets/f359d7cb-370f-4775-bc8e-748ca48f3ae0" />
 <img width="360" height="806" alt="Screenshot_20250710-130657" src="https://github.com/user-attachments/assets/fcddbad4-07ce-48dc-a6ee-6b5b876878fa" />
@@ -23,6 +22,7 @@ A comprehensive Flutter application designed for Haramaya University students an
 <img width="360" height="806" alt="Screenshot_20250710-133101" src="https://github.com/user-attachments/assets/118a516b-16e9-4003-ad5d-cda16964b1de" />
 <img width="360" height="806" alt="Screenshot_20250710-130910" src="https://github.com/user-attachments/assets/2a84a8cf-64e9-42a3-b315-55ab9d1ab592" />
 <img width="360" height="806" alt="Screenshot_20250710-130754" src="https://github.com/user-attachments/assets/bbd29d9e-daee-46f3-86cc-3fb7104f034b" />
+<img width="360" height="806" alt="Screenshot_20250710-131018" src="https://github.com/user-attachments/assets/48a857af-7bf1-421a-8c4a-f894e272b441" />
 
 
 
