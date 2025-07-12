@@ -9,7 +9,7 @@ A comprehensive Flutter application designed for Haramaya University students an
 
 ## 📱 Screenshots
 <img width="360" height="806" alt="Screenshot_20250710-131045" src="https://github.com/user-attachments/assets/1a424e33-aac6-4bab-90e2-18b9afb32035" />
-<img width="720" height="1612" alt="Screenshot_20250710-130736" src="https://github.com/user-attachments/assets/8e17f541-598e-4324-a359-52cf5129d9b7" />
+<img width="360" height="806" alt="Screenshot_20250710-130736" src="https://github.com/user-attachments/assets/8e17f541-598e-4324-a359-52cf5129d9b7" />
 <img width="360" height="806" alt="Screenshot_20250710-130726" src="https://github.com/user-attachments/assets/f359d7cb-370f-4775-bc8e-748ca48f3ae0" />
 <img width="360" height="806" alt="Screenshot_20250710-130657" src="https://github.com/user-attachments/assets/fcddbad4-07ce-48dc-a6ee-6b5b876878fa" />
 <img width="360" height="806" alt="Screenshot_20250710-130920" src="https://github.com/user-attachments/assets/32326708-f2fc-4770-b513-a42af6263b45" />
