@@ -7,10 +7,6 @@ import 'my_exam_history_page.dart';
 class ExamCenterPage extends StatefulWidget {
   const ExamCenterPage({Key? key}) : super(key: key);
 
-  // Removed static future to always fetch latest data
-  // static final Future<QuerySnapshot> _examsFuture =
-  //     FirebaseFirestore.instance.collection('exit_exam_questions').get();
-
   @override
   State<ExamCenterPage> createState() => _ExamCenterPageState();
 }
@@ -122,16 +118,6 @@ class _ExamCenterPageState extends State<ExamCenterPage> {
             const SizedBox(height: 24),
             const Text(
                 'No departments found. Import questions to get started.'),
-            const SizedBox(height: 24),
-            if (isAdmin)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file),
-                label: const Text('Import Exam Questions'),
-                onPressed: () {
-                  Navigator.of(context)
-                      .pushNamed('/import-exit-exam-questions');
-                },
-              ),
           ],
         ),
       );

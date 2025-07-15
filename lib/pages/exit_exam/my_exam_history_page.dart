@@ -115,16 +115,25 @@ class MyExamHistoryPage extends StatelessWidget {
                                 children: [
                                   Text(
                                     '${data['department'] ?? ''} | Year: ${data['year'] ?? ''} | ${data['examType'] ?? ''}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   if (data['startedAt'] != null)
                                     Text(
                                       _formatDate(data['startedAt']),
-                                      style: const TextStyle(
-                                          color: Colors.grey, fontSize: 13),
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withOpacity(0.6),
+                                        fontSize: 13,
+                                      ),
                                     ),
                                 ],
                               ),
@@ -135,18 +144,20 @@ class MyExamHistoryPage extends StatelessWidget {
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: status == 'completed'
-                                    ? Colors.green
-                                    : Colors.orange,
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : Theme.of(context).colorScheme.primary,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 status == 'completed'
                                     ? 'Completed'
                                     : 'In Progress',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12),
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ],
@@ -162,12 +173,14 @@ class MyExamHistoryPage extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue,
+                                  color: Theme.of(context).colorScheme.tertiary,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text('Score: $score/$total',
-                                    style: const TextStyle(
-                                        color: Colors.white,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onTertiary,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12)),
                               ),
@@ -176,12 +189,16 @@ class MyExamHistoryPage extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text('Time: ${_formatTime(timeTaken)}',
-                                    style: const TextStyle(
-                                        color: Colors.white,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12)),
                               ),
@@ -194,22 +211,32 @@ class MyExamHistoryPage extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               child: Row(
                                 children: [
-                                  const Text('Answers: ',
+                                  Text('Answers: ',
                                       style: TextStyle(
-                                          fontWeight: FontWeight.w500)),
+                                          fontWeight: FontWeight.w500,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface)),
                                   ...answers.map((a) => Container(
                                         margin: const EdgeInsets.symmetric(
                                             horizontal: 4),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.grey.shade800
+                                              : Colors.grey.shade200,
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
                                         child: Text(a.toString(),
-                                            style:
-                                                const TextStyle(fontSize: 13)),
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            )),
                                       )),
                                 ],
                               ),
