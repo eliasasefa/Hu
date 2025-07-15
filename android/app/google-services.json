@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "your-project-number",
-    "project_id": "your-project-id",
-    "storage_bucket": "your-bucket-id"
+    "project_number": "164188610636",
+    "project_id": "hu-app-b200b",
+    "storage_bucket": "hu-app-b200b.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "your-app-id",
+        "mobilesdk_app_id": "1:164188610636:android:c3218e045d5965a4ac14e9",
         "android_client_info": {
-          "package_name": "you-package-name"
+          "package_name": "com.hu.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "your-key"
+          "current_key": "AIzaSyAOWt8-rQdcHLkjfinXfyF-VxgrsFUJ3Tw"
         }
       ],
       "services": {

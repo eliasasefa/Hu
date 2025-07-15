@@ -17,11 +17,127 @@ class ExamCenterPage extends StatefulWidget {
 
 class _ExamCenterPageState extends State<ExamCenterPage> {
   String _searchQuery = '';
+  List<QueryDocumentSnapshot>? _allQuestions;
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchQuestions();
+  }
+
+  Future<void> _fetchQuestions() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('exit_exam_questions')
+          .get();
+      setState(() {
+        _allQuestions = snapshot.docs;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  Map<String, List<Map<String, String>>> _getFilteredGrouped() {
+    // Group by department, year, examType from flat question docs
+    final Map<String, Set<Map<String, String>>> grouped = {};
+    if (_allQuestions != null) {
+      for (final doc in _allQuestions!) {
+        final data = doc.data() as Map<String, dynamic>;
+        final dept = data['department']?.toString();
+        final year = data['year']?.toString();
+        final examType = data['examType']?.toString();
+        if (dept != null &&
+            dept.isNotEmpty &&
+            year != null &&
+            examType != null) {
+          grouped.putIfAbsent(dept, () => <Map<String, String>>{});
+          grouped[dept]!.add({'year': year, 'examType': examType});
+        }
+      }
+    }
+    final Map<String, List<Map<String, String>>> flatGrouped =
+        grouped.map((k, v) => MapEntry(k, v.toList()));
+    // Filter logic
+    Map<String, List<Map<String, String>>> filteredGrouped;
+    final String query = _searchQuery.trim().toLowerCase();
+    if (query.isEmpty) {
+      filteredGrouped = flatGrouped;
+    } else {
+      filteredGrouped = {};
+      for (final entry in flatGrouped.entries) {
+        final dept = entry.key;
+        final exams = entry.value;
+        if (dept.toLowerCase().contains(query)) {
+          filteredGrouped[dept] = exams;
+        } else {
+          final filteredExams = exams
+              .where((exam) =>
+                  exam['year']!.toLowerCase().contains(query) ||
+                  exam['examType']!.toLowerCase().contains(query))
+              .toList();
+          if (filteredExams.isNotEmpty) {
+            filteredGrouped[dept] = filteredExams;
+          }
+        }
+      }
+    }
+    return filteredGrouped;
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final isAdmin = user?.email == 'eliasasefa3@gmail.com';
+    if (_loading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Exam Center'), centerTitle: true),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_error != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Exam Center'), centerTitle: true),
+        body: Center(child: Text('Error loading exams: \n${_error!}')),
+      );
+    }
+    if (_allQuestions == null || _allQuestions!.isEmpty) {
+      debugPrint('Firestore returned no data or empty docs.');
+      return Scaffold(
+        appBar: AppBar(title: const Text('Exam Center'), centerTitle: true),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _examHistoryCard(context),
+            const SizedBox(height: 24),
+            const Text(
+                'No departments found. Import questions to get started.'),
+            const SizedBox(height: 24),
+            if (isAdmin)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Import Exam Questions'),
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushNamed('/import-exit-exam-questions');
+                },
+              ),
+          ],
+        ),
+      );
+    }
+    final filteredGrouped = _getFilteredGrouped();
+    final filteredDepartments = filteredGrouped.keys.toList()..sort();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Exam Center'),
@@ -29,154 +145,68 @@ class _ExamCenterPageState extends State<ExamCenterPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: FutureBuilder<QuerySnapshot>(
-          future: FirebaseFirestore.instance
-              .collection('exit_exam_questions')
-              .get(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('Error loading exams: \n${snapshot.error}'),
-              );
-            }
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              debugPrint('Firestore returned no data or empty docs.');
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _examHistoryCard(context),
-                  const SizedBox(height: 24),
-                  const Text(
-                      'No departments found. Import questions to get started.'),
-                  const SizedBox(height: 24),
-                  if (isAdmin)
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.upload_file),
-                      label: const Text('Import Exam Questions'),
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pushNamed('/import-exit-exam-questions');
+        child: Column(
+          children: [
+            // Search bar
+            TextField(
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: 'Search department, year, or exam type',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+            const SizedBox(height: 18),
+            _examHistoryCard(context),
+            const SizedBox(height: 18),
+            Expanded(
+              child: filteredDepartments.isEmpty
+                  ? const Center(child: Text('No departments found.'))
+                  : ListView.builder(
+                      itemCount: filteredDepartments.length,
+                      itemBuilder: (context, i) {
+                        final department = filteredDepartments[i];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 4),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          elevation: 4,
+                          child: ListTile(
+                            leading: Icon(Icons.school,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 32),
+                            title: Text(
+                              department,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text('Tap to view and start exams',
+                                style: Theme.of(context).textTheme.bodyMedium),
+                            trailing: const Icon(Icons.arrow_forward_ios,
+                                color: Colors.grey),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => DepartmentExamPage(
+                                      department: department),
+                                ),
+                              );
+                            },
+                          ),
+                        );
                       },
                     ),
-                ],
-              );
-            }
-            // Group by department, year, examType from flat question docs
-            final Map<String, Set<Map<String, String>>> grouped = {};
-            for (final doc in snapshot.data!.docs) {
-              final data = doc.data() as Map<String, dynamic>;
-              final dept = data['department']?.toString();
-              final year = data['year']?.toString();
-              final examType = data['examType']?.toString();
-              if (dept != null &&
-                  dept.isNotEmpty &&
-                  year != null &&
-                  examType != null) {
-                grouped.putIfAbsent(dept, () => <Map<String, String>>{});
-                grouped[dept]!.add({'year': year, 'examType': examType});
-              }
-            }
-            // Convert sets to lists for UI
-            final Map<String, List<Map<String, String>>> flatGrouped =
-                grouped.map((k, v) => MapEntry(k, v.toList()));
-            // Filter logic
-            Map<String, List<Map<String, String>>> filteredGrouped;
-            List<String> filteredDepartments;
-            final String query = _searchQuery.trim().toLowerCase();
-            if (query.isEmpty) {
-              filteredGrouped = flatGrouped;
-              filteredDepartments = flatGrouped.keys.toList()..sort();
-            } else {
-              filteredGrouped = {};
-              for (final entry in flatGrouped.entries) {
-                final dept = entry.key;
-                final exams = entry.value;
-                // If department matches, include all its exams
-                if (dept.toLowerCase().contains(query)) {
-                  filteredGrouped[dept] = exams;
-                } else {
-                  // Otherwise, filter exams by year or examType
-                  final filteredExams = exams
-                      .where((exam) =>
-                          exam['year']!.toLowerCase().contains(query) ||
-                          exam['examType']!.toLowerCase().contains(query))
-                      .toList();
-                  if (filteredExams.isNotEmpty) {
-                    filteredGrouped[dept] = filteredExams;
-                  }
-                }
-              }
-              filteredDepartments = filteredGrouped.keys.toList()..sort();
-            }
-            return Column(
-              children: [
-                // Search bar
-                TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    hintText: 'Search departments',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _searchQuery = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 18),
-                _examHistoryCard(context),
-                const SizedBox(height: 18),
-                Expanded(
-                  child: filteredDepartments.isEmpty
-                      ? const Center(child: Text('No departments found.'))
-                      : ListView.builder(
-                          itemCount: filteredDepartments.length,
-                          itemBuilder: (context, i) {
-                            final department = filteredDepartments[i];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 4),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              elevation: 4,
-                              child: ListTile(
-                                leading: Icon(Icons.school,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    size: 32),
-                                title: Text(
-                                  department,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('Tap to view and start exams',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium),
-                                trailing: const Icon(Icons.arrow_forward_ios,
-                                    color: Colors.grey),
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => DepartmentExamPage(
-                                          department: department),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
