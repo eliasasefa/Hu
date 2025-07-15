@@ -204,42 +204,50 @@ class MyExamHistoryPage extends StatelessWidget {
                               ),
                           ],
                         ),
-                        if (answers != null && answers.isNotEmpty)
+                        // Always show progress for in-progress exams with a known total > 0
+                        if (status == 'in-progress' &&
+                            total != null &&
+                            total > 0)
                           Padding(
                             padding: const EdgeInsets.only(top: 10.0),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  Text('Answers: ',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Progress: ${(answers != null ? answers.where((a) => a != null).length : 0)}/$total answered',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: LinearProgressIndicator(
+                                        value: (answers != null
+                                                ? answers
+                                                    .where((a) => a != null)
+                                                    .length
+                                                : 0) /
+                                            total,
+                                        minHeight: 8,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      '${(((answers != null ? answers.where((a) => a != null).length : 0) / total) * 100).toStringAsFixed(0)}% done',
                                       style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface)),
-                                  ...answers.map((a) => Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 4),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.grey.shade800
-                                              : Colors.grey.shade200,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Text(a.toString(),
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                            )),
-                                      )),
-                                ],
-                              ),
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                       ],
