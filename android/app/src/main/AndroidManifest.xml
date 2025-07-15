@@ -7,6 +7,7 @@
 
 
     <application
+        android:enableOnBackInvokedCallback="true"
         android:usesCleartextTraffic="true"
         android:label="HU"
         android:name="${applicationName}"

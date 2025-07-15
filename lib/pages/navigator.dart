@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mywebapp/pages/drawer_pages/about_us.dart';
-import 'package:mywebapp/pages/drawer_pages/campuses.dart';
-import 'package:mywebapp/pages/drawer_pages/developer_profile.dart';
-import 'package:mywebapp/pages/drawer_pages/settings_page.dart';
+import 'package:hu/pages/drawer_pages/about_us.dart';
+import 'package:hu/pages/drawer_pages/campuses.dart';
+import 'package:hu/pages/drawer_pages/developer_profile.dart';
+import 'package:hu/pages/drawer_pages/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mywebapp/pages/exit_exam/my_exam_history_page.dart';
+import 'package:hu/pages/exit_exam/my_exam_history_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

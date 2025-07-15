@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mywebapp/pages/custom_widgets/custom_widget.dart';
+import 'package:hu/pages/custom_widgets/custom_widget.dart';
 
 class CustomWebView extends StatelessWidget {
   final String url;

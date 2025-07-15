@@ -48,18 +48,37 @@ class _TakeExitExamPageState extends State<TakeExitExamPage> {
     try {
       print(
           'Fetching for dept=${widget.department}, year=${widget.year}, type=${widget.examType}');
-      final docRef = FirebaseFirestore.instance
+      final snapshot = await FirebaseFirestore.instance
           .collection('exit_exam_questions')
-          .doc('${widget.department}_${widget.year}_${widget.examType}');
-      final snapshot =
-          await docRef.collection('questions').orderBy('createdAt').get();
-      _questions = snapshot.docs.map((doc) => doc.data()).toList();
+          .where('department', isEqualTo: widget.department)
+          .where('year', isEqualTo: widget.year)
+          .where('examType', isEqualTo: widget.examType)
+          .get();
+      print('Raw docs:');
+      for (final doc in snapshot.docs) {
+        print(doc.data());
+      }
+      // Defensive mapping: ensure answers is a List<String> and correctAnswer is int
+      _questions = snapshot.docs
+          .map((doc) {
+            final data = doc.data();
+            return {
+              'question': data['question']?.toString(),
+              'answers': (data['answers'] is List)
+                  ? List<String>.from(data['answers'])
+                  : <String>[],
+              'correctAnswer': data['correctAnswer'] is int
+                  ? data['correctAnswer']
+                  : int.tryParse(data['correctAnswer']?.toString() ?? ''),
+              'explanation': data['explanation']?.toString() ?? '',
+            };
+          })
+          .where(
+              (q) => q['question'] != null && (q['answers'] as List).isNotEmpty)
+          .toList();
+      print('Mapped questions: $_questions');
       print('Found ${_questions.length} questions');
 
-      // Initialize answers based on priority:
-      // 1. Widget selectedAnswers (from exam history resume)
-      // 2. Existing answers from in-progress attempt (will be set in _startAttemptTracking)
-      // 3. Empty answers
       if (widget.selectedAnswers != null &&
           widget.selectedAnswers!.length == _questions.length) {
         _selectedAnswers = List<int?>.from(widget.selectedAnswers!);

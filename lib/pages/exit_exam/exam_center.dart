@@ -7,8 +7,9 @@ import 'my_exam_history_page.dart';
 class ExamCenterPage extends StatefulWidget {
   const ExamCenterPage({Key? key}) : super(key: key);
 
-  static final Future<QuerySnapshot> _examsFuture =
-      FirebaseFirestore.instance.collection('exit_exam_questions').get();
+  // Removed static future to always fetch latest data
+  // static final Future<QuerySnapshot> _examsFuture =
+  //     FirebaseFirestore.instance.collection('exit_exam_questions').get();
 
   @override
   State<ExamCenterPage> createState() => _ExamCenterPageState();
@@ -29,12 +30,20 @@ class _ExamCenterPageState extends State<ExamCenterPage> {
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: FutureBuilder<QuerySnapshot>(
-          future: ExamCenterPage._examsFuture,
+          future: FirebaseFirestore.instance
+              .collection('exit_exam_questions')
+              .get(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error loading exams: \n${snapshot.error}'),
+              );
+            }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              debugPrint('Firestore returned no data or empty docs.');
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -55,8 +64,8 @@ class _ExamCenterPageState extends State<ExamCenterPage> {
                 ],
               );
             }
-            // Group exams by department
-            final Map<String, List<Map<String, String>>> grouped = {};
+            // Group by department, year, examType from flat question docs
+            final Map<String, Set<Map<String, String>>> grouped = {};
             for (final doc in snapshot.data!.docs) {
               final data = doc.data() as Map<String, dynamic>;
               final dept = data['department']?.toString();
@@ -66,24 +75,23 @@ class _ExamCenterPageState extends State<ExamCenterPage> {
                   dept.isNotEmpty &&
                   year != null &&
                   examType != null) {
-                grouped.putIfAbsent(dept, () => []);
-                // Avoid duplicate year+examType pairs
-                if (!grouped[dept]!.any(
-                    (e) => e['year'] == year && e['examType'] == examType)) {
-                  grouped[dept]!.add({'year': year, 'examType': examType});
-                }
+                grouped.putIfAbsent(dept, () => <Map<String, String>>{});
+                grouped[dept]!.add({'year': year, 'examType': examType});
               }
             }
+            // Convert sets to lists for UI
+            final Map<String, List<Map<String, String>>> flatGrouped =
+                grouped.map((k, v) => MapEntry(k, v.toList()));
             // Filter logic
-            final String query = _searchQuery.trim().toLowerCase();
             Map<String, List<Map<String, String>>> filteredGrouped;
             List<String> filteredDepartments;
+            final String query = _searchQuery.trim().toLowerCase();
             if (query.isEmpty) {
-              filteredGrouped = grouped;
-              filteredDepartments = grouped.keys.toList()..sort();
+              filteredGrouped = flatGrouped;
+              filteredDepartments = flatGrouped.keys.toList()..sort();
             } else {
               filteredGrouped = {};
-              for (final entry in grouped.entries) {
+              for (final entry in flatGrouped.entries) {
                 final dept = entry.key;
                 final exams = entry.value;
                 // If department matches, include all its exams
@@ -109,7 +117,7 @@ class _ExamCenterPageState extends State<ExamCenterPage> {
                 TextField(
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
-                    hintText: 'Search exams by department, year, or type',
+                    hintText: 'Search departments',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -125,10 +133,45 @@ class _ExamCenterPageState extends State<ExamCenterPage> {
                 const SizedBox(height: 18),
                 Expanded(
                   child: filteredDepartments.isEmpty
-                      ? const Center(child: Text('No exams found.'))
-                      : _DepartmentExpansionList(
-                          grouped: filteredGrouped,
-                          departments: filteredDepartments,
+                      ? const Center(child: Text('No departments found.'))
+                      : ListView.builder(
+                          itemCount: filteredDepartments.length,
+                          itemBuilder: (context, i) {
+                            final department = filteredDepartments[i];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 4),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              elevation: 4,
+                              child: ListTile(
+                                leading: Icon(Icons.school,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    size: 32),
+                                title: Text(
+                                  department,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text('Tap to view and start exams',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium),
+                                trailing: const Icon(Icons.arrow_forward_ios,
+                                    color: Colors.grey),
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => DepartmentExamPage(
+                                          department: department),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
                         ),
                 ),
               ],
@@ -349,19 +392,21 @@ class _DepartmentExamPageState extends State<DepartmentExamPage> {
         .collection('exit_exam_questions')
         .where('department', isEqualTo: widget.department)
         .get();
-    final pairSet = <String>{};
+    final Map<String, Set<String>> yearTypeSet = {};
     final pairs = <Map<String, String>>[];
     for (final doc in snapshot.docs) {
       final y = doc['year']?.toString();
       final t = doc['examType']?.toString();
       if (y != null && t != null) {
-        final key = '$y|$t';
-        if (!pairSet.contains(key)) {
-          pairSet.add(key);
-          pairs.add({'year': y, 'examType': t});
-        }
+        yearTypeSet.putIfAbsent(y, () => <String>{});
+        yearTypeSet[y]!.add(t);
       }
     }
+    yearTypeSet.forEach((year, types) {
+      for (final type in types) {
+        pairs.add({'year': year, 'examType': type});
+      }
+    });
     setState(() {
       examPairs = pairs;
       loading = false;
@@ -403,80 +448,6 @@ class _DepartmentExamPageState extends State<DepartmentExamPage> {
                     );
                   },
                 ),
-    );
-  }
-}
-
-class _DepartmentExpansionList extends StatefulWidget {
-  final Map<String, List<Map<String, String>>> grouped;
-  final List<String> departments;
-  const _DepartmentExpansionList({
-    Key? key,
-    required this.grouped,
-    required this.departments,
-  }) : super(key: key);
-
-  @override
-  State<_DepartmentExpansionList> createState() =>
-      _DepartmentExpansionListState();
-}
-
-class _DepartmentExpansionListState extends State<_DepartmentExpansionList> {
-  late List<bool> _expanded;
-
-  @override
-  void initState() {
-    super.initState();
-    _expanded = List.generate(widget.departments.length, (_) => false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: widget.departments.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 18),
-      itemBuilder: (context, i) {
-        final department = widget.departments[i];
-        final exams = widget.grouped[department]!;
-        return ExpansionTile(
-          key: PageStorageKey(department),
-          initiallyExpanded: _expanded[i],
-          onExpansionChanged: (expanded) {
-            setState(() {
-              _expanded[i] = expanded;
-            });
-          },
-          leading:
-              Icon(Icons.school, color: Theme.of(context).colorScheme.primary),
-          title: Text(
-            department,
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          children: exams
-              .map((exam) => ListTile(
-                    contentPadding: const EdgeInsets.only(left: 24, right: 16),
-                    leading: const Icon(Icons.description),
-                    title:
-                        Text('Year ${exam['year']} - ${exam['examType']} Exam'),
-                    trailing: const Icon(Icons.arrow_forward),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => TakeExitExamPage(
-                            department: department,
-                            year: exam['year']!,
-                            examType: exam['examType']!,
-                          ),
-                        ),
-                      );
-                    },
-                  ))
-              .toList(),
-        );
-      },
     );
   }
 }

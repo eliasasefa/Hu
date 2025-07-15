@@ -60,23 +60,29 @@ class _ImportExitExamQuestionsPageState
       setState(() {
         _totalToImport = questions.length;
       });
-      final docRef = FirebaseFirestore.instance
-          .collection('exit_exam_questions')
-          .doc('${department}_${year}_${examType}');
       for (int i = 0; i < questions.length; i++) {
-        final q = questions[i];
+        final q = questions[i] as Map<String, dynamic>;
         setState(() {
           _currentImport = i + 1;
         });
-        if (q['question'] != null &&
-            q['answers'] != null &&
-            q['correctAnswer'] != null &&
-            (q['answers'] as List).length == 4) {
-          await docRef.collection('questions').add({
-            'question': q['question'],
-            'answers': List<String>.from(q['answers']),
-            'correctAnswer': q['correctAnswer'],
-            'explanation': q['explanation'] ?? '',
+        final question = q['question']?.toString();
+        final answers =
+            q['answers'] is List ? List<String>.from(q['answers']) : null;
+        final correctAnswer = q['correctAnswer'] is int
+            ? q['correctAnswer']
+            : int.tryParse(q['correctAnswer']?.toString() ?? '');
+        final explanation = q['explanation']?.toString() ?? '';
+        if (question != null &&
+            answers != null &&
+            correctAnswer != null &&
+            answers.length == 4) {
+          await FirebaseFirestore.instance
+              .collection('exit_exam_questions')
+              .add({
+            'question': question,
+            'answers': answers,
+            'correctAnswer': correctAnswer,
+            'explanation': explanation,
             'department': department,
             'year': year,
             'examType': examType,

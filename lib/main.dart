@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'pages/navbar/main_home.dart';
-import 'pages/exit_exam/take_exit_exam_page.dart';
 import 'pages/exit_exam/import_exit_exam_questions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/auth/login_page.dart';
@@ -18,12 +17,18 @@ Future<void> main() async {
     // You may want to log or handle this error
     debugPrint('Failed to load .env file: $e');
   }
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // Initialize Firebase only if not already initialized
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized.');
+  } else {
+    print('Firebase already initialized.');
+  }
 
   // Only sign out on app start if remember_me is not enabled
   final rememberMe = prefs.getBool('remember_me') ?? false;

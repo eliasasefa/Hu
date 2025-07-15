@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mywebapp/pages/custom_widgets/custom_webview.dart';
-import 'package:mywebapp/pages/drawer_pages/home_screen_image_scroller.dart';
+import 'package:hu/pages/custom_widgets/custom_webview.dart';
+import 'package:hu/pages/drawer_pages/home_screen_image_scroller.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:mywebapp/pages/exit_exam/exam_center.dart';
+import 'package:hu/pages/exit_exam/exam_center.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key});

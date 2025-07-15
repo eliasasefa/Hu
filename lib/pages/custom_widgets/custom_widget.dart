@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:mywebapp/pages/navbar/element_remover.dart';
+import 'package:hu/pages/navbar/element_remover.dart';
 
 class WebViewPage extends StatefulWidget {
   final String url;

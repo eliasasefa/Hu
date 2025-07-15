@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mywebapp/pages/custom_widgets/custom_webview_navbar.dart';
-import 'package:mywebapp/pages/navbar/homepage.dart';
-import 'package:mywebapp/pages/navigator.dart';
+import 'package:hu/pages/custom_widgets/custom_webview_navbar.dart';
+import 'package:hu/pages/navbar/homepage.dart';
+import 'package:hu/pages/navigator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainHome extends StatefulWidget {
