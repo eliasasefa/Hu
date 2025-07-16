@@ -103,7 +103,22 @@ class _SettingsPageState extends State<SettingsPage> {
       );
 
       if (isAuthenticated) {
-        // Store credentials securely (if needed, e.g., for biometric login)
+        // Use only stored credentials
+        final email = await _secureStorage.read(key: 'last_logged_in_email');
+        final password = await _secureStorage.read(key: 'stored_password');
+        print('[DEBUG] Attempting to enable biometric with email: '
+            '\u001b[32m$email\u001b[0m, password: \u001b[32m$password\u001b[0m');
+        if (email == null || password == null) {
+          print(
+              '[DEBUG] Stored credentials not found. Email: $email, Password: $password');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content:
+                    Text('Stored credentials not found. Please log in again.')),
+          );
+          return;
+        }
+        // No Firebase re-authentication, just enable biometric
         await _secureStorage.write(key: 'biometric_enabled', value: 'true');
         setState(() {
           _biometricEnabled = true;
@@ -136,6 +151,37 @@ class _SettingsPageState extends State<SettingsPage> {
         SnackBar(content: Text('Failed to disable biometric: $e')),
       );
     }
+  }
+
+  Future<String?> _showPasswordDialog() async {
+    String? password;
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: const Text('Enter Password'),
+          content: TextField(
+            controller: controller,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Password'),
+            autofocus: true,
+            onSubmitted: (_) => Navigator.of(context).pop(controller.text),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   String _getBiometricTypeName(BiometricType type) {

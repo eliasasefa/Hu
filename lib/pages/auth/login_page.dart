@@ -123,53 +123,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _enableBiometric() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      if (_emailController.text.trim().isEmpty ||
-          _passwordController.text.trim().isEmpty) {
-        setState(() {
-          _error = 'Please enter your email and password first.';
-          _loading = false;
-        });
-        return;
-      }
-      final isAuthenticated = await _localAuth.authenticate(
-        localizedReason: 'Please authenticate to enable biometric login',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
-      );
-      if (isAuthenticated) {
-        print('[DEBUG] Enabling biometric for email: '
-            '[32m${_emailController.text.trim()}[0m, password: [32m${_passwordController.text.trim()}[0m');
-        await _secureStorage.write(
-            key: 'last_logged_in_email', value: _emailController.text.trim());
-        await _secureStorage.write(
-            key: 'stored_password', value: _passwordController.text.trim());
-        await _secureStorage.write(key: 'biometric_enabled', value: 'true');
-        setState(() {
-          _biometricEnabled = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Biometric login enabled!')),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to enable biometric authentication.';
-      });
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() {
@@ -177,35 +130,18 @@ class _LoginPageState extends State<LoginPage> {
       _error = null;
     });
     try {
-      if (_isLogin) {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-        print('[DEBUG] Writing last_logged_in_email: '
-            '[32m${_emailController.text.trim()}[0m');
-        await _secureStorage.write(
-            key: 'last_logged_in_email', value: _emailController.text.trim());
-        if (_biometricEnabled) {
-          print('[DEBUG] Writing stored_password: '
-              '[32m${_passwordController.text.trim()}[0m');
-          await _secureStorage.write(
-              key: 'stored_password', value: _passwordController.text.trim());
-        }
-      } else {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-        print('[DEBUG] Writing last_logged_in_email: '
-            '[32m${_emailController.text.trim()}[0m');
-        print('[DEBUG] Writing stored_password: '
-            '[32m${_passwordController.text.trim()}[0m');
-        await _secureStorage.write(
-            key: 'last_logged_in_email', value: _emailController.text.trim());
-        await _secureStorage.write(
-            key: 'stored_password', value: _passwordController.text.trim());
-      }
+      // Save credentials BEFORE Firebase Auth call for reliability
+      await _secureStorage.write(
+          key: 'last_logged_in_email', value: _emailController.text.trim());
+      await _secureStorage.write(
+          key: 'stored_password', value: _passwordController.text.trim());
+      final debugEmail = await _secureStorage.read(key: 'last_logged_in_email');
+      final debugPassword = await _secureStorage.read(key: 'stored_password');
+
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
       if (_biometricAvailable && !_biometricEnabled) {
         setState(() {
           _showEnableBiometricPrompt = true;
@@ -242,58 +178,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (_isLogin &&
-                        _biometricAvailable &&
-                        !_biometricEnabled &&
-                        _showBiometricBanner)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 18),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.fingerprint, size: 32),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Tired of typing your password? Enable biometric login for quick access!',
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              tooltip: 'Dismiss',
-                              onPressed: () {
-                                setState(() {
-                                  _showBiometricBanner = false;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    if (_isLogin &&
-                        _biometricAvailable &&
-                        !_biometricEnabled &&
-                        _showBiometricBanner)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 18),
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.fingerprint),
-                          label: const Text('Enable Now'),
-                          onPressed: _loading ? null : _enableBiometric,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ),
                     CircleAvatar(
                       radius: 40,
                       backgroundColor:
@@ -365,35 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
-                    // Show prompt/banner/button to enable biometric after manual login
-                    if (_showEnableBiometricPrompt &&
-                        _biometricAvailable &&
-                        !_biometricEnabled)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Card(
-                          color: theme.colorScheme.primary.withOpacity(0.08),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.fingerprint),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    'You can enable biometric login for faster sign in next time.',
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: _loading ? null : _enableBiometric,
-                                  child: const Text('Enable'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -433,17 +289,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ],
-                    // Show enable biometric button if available but not enabled
-                    if (_biometricAvailable && !_biometricEnabled) ...[
-                      const SizedBox(height: 16),
-                      Center(
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.fingerprint),
-                          label: const Text('Enable Biometric Login'),
-                          onPressed: _loading ? null : _enableBiometric,
-                        ),
-                      ),
-                    ],
+
                     TextButton(
                       onPressed: _loading
                           ? null

@@ -171,12 +171,12 @@ class NavBar extends StatelessWidget {
                   if (shouldLogout == true) {
                     // Clear Firebase Auth
                     await FirebaseAuth.instance.signOut();
-                    // Do NOT clear secure storage for biometric login here
-                    // const FlutterSecureStorage secureStorage =
-                    //     FlutterSecureStorage();
-                    // await secureStorage.delete(key: 'stored_password');
-                    // await secureStorage.delete(key: 'biometric_enabled');
-                    // await secureStorage.delete(key: 'last_logged_in_email');
+                    // Clear secure storage for credentials and biometric
+                    const FlutterSecureStorage secureStorage =
+                        FlutterSecureStorage();
+                    await secureStorage.delete(key: 'stored_password');
+                    await secureStorage.delete(key: 'biometric_enabled');
+                    await secureStorage.delete(key: 'last_logged_in_email');
                     // Clear remember me from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('remember_me');
