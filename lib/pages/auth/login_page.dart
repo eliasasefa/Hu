@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   String? _lastLoggedInEmail;
   bool _showBiometricBanner = true;
   bool _showEnableBiometricPrompt = false;
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -200,7 +201,9 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: const InputDecoration(
                               labelText: 'Email',
                               prefixIcon: Icon(Icons.email_outlined),
-                              border: OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(16))),
                             ),
                             keyboardType: TextInputType.emailAddress,
                             validator: (v) => v == null || !v.contains('@')
@@ -210,12 +213,25 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 18),
                           TextFormField(
                             controller: _passwordController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock_outline),
-                              border: OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              border: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(16)),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(_obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
                             ),
-                            obscureText: true,
+                            obscureText: _obscurePassword,
                             validator: (v) => v == null || v.length < 6
                                 ? 'Password too short'
                                 : null,
