@@ -168,36 +168,7 @@ Future<void> main() async {
           ? ThemeMode.light
           : ThemeMode.system;
 
-  final isFirstLaunch = prefs.getBool('isFirstLaunch');
-
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData.light(),
-    darkTheme: ThemeData.dark(),
-    themeMode: themeMode,
-    routes: {
-      '/import-exit-exam-questions': (context) =>
-          const ImportExitExamQuestionsPage(),
-    },
-    home: (isFirstLaunch == null || isFirstLaunch == true)
-        ? const Splash()
-        : StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                    body: Center(child: CircularProgressIndicator()));
-              }
-              if (snapshot.hasData) {
-                return MainHome(
-                    toggleTheme:
-                        () {}); // You can pass your toggleTheme logic here if needed
-              } else {
-                return LoginPage(onLoginSuccess: () {});
-              }
-            },
-          ),
-  ));
+  runApp(MyApp(initialThemeMode: themeMode));
 }
 
 class MyApp extends StatefulWidget {
@@ -260,17 +231,32 @@ class _MyAppState extends State<MyApp> {
         '/import-exit-exam-questions': (context) =>
             const ImportExitExamQuestionsPage(),
       },
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
+      home: FutureBuilder<SharedPreferences>(
+        future: SharedPreferences.getInstance(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (!snapshot.hasData) {
             return const Scaffold(
                 body: Center(child: CircularProgressIndicator()));
           }
-          if (snapshot.hasData) {
-            return MainHome(toggleTheme: toggleTheme);
+          final prefs = snapshot.data!;
+          final isFirstLaunch = prefs.getBool('isFirstLaunch');
+          if (isFirstLaunch == null || isFirstLaunch == true) {
+            return const Splash();
           } else {
-            return LoginPage(onLoginSuccess: () => setState(() {}));
+            return StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()));
+                }
+                if (snapshot.hasData) {
+                  return MainHome(toggleTheme: toggleTheme);
+                } else {
+                  return LoginPage(onLoginSuccess: () => setState(() {}));
+                }
+              },
+            );
           }
         },
       ),
